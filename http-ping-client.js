@@ -5,7 +5,7 @@ var program = require('commander');
 program
   .version('0.1')
   .option('-c, --count [number]', 'Number of HTTP requests [100]', 100)
-  .option('-u, --url [addr]', 'URL to ping server [http://localhost:3000]', 'http://localhost:3000')
+  .option('-u, --url [addr]', 'URL to ping server [http://localhost:3000/ping]', 'http://localhost:3000/ping')
   .parse(process.argv);
 
 var count = program.count;
@@ -19,15 +19,18 @@ function callback(error, response, body) {
       console.log(count);
     }
     if(count > 0){
-      request(url + '/ping', callback);
+      request(url, callback);
     }else{
       console.log(stopwatch.stats());
     }
   }else{
     console.error('There was an error processing the HTTP request');
-    throw error;
+    if(error)
+      throw error;
+    else
+      console.error("Returned HTTP code %d: %s", response.statusCode, body);
   }
 }
 
 stopwatch.tic();
-request('http://localhost:3000/ping', callback);
+request(url, callback);
